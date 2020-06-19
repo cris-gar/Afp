@@ -11,12 +11,13 @@ class Habitad extends Afp
     private $touchId;
     private $request;
     private $saldoTotal;
-    private $saldoTotalWithOutSymbol;
+    private $saldoObligatorio;
+    private $saldoCuenta2;
 
-    function __construct(String $rut, String $password)
+    function __construct($params)
     {
-        parent::setRut($rut);
-        parent::setPassword($password);
+        parent::setRut($params['rut']);
+        parent::setPassword($params['password']);
         $this->setRequest();
     }
 
@@ -49,14 +50,13 @@ class Habitad extends Afp
 
     public function SaldoTotal() {
         if(!is_null($this->saldoTotal)) return $this->saldoTotal;
-        $this->Conectar();
+        if(is_null($this->touchId)) $this->Conectar();
         $url = self::$urlSaldo . $this->touchId;
         $crawler = $this->request->request('GET', $url);
         $saldo =  $crawler->filter('.ht-ahorrado')->each(function ($node) {
            return $node->text();
         });
         $this->setSaldo($saldo[0]);
-        $this->clearSaldo();
         return $this->saldoTotal;
     }
  
@@ -64,24 +64,41 @@ class Habitad extends Afp
         $this->saldoTotal = $saldo;
     }
 
-    protected function setSaldoWithOutSymbol($saldo) {
-        $this->saldoTotal = $saldo;
-    }
-
-    protected function clearSaldo() {
-        $this->saldoTotalWithOutSymbol = str_replace('$', '', str_replace('.', '', $this->saldoTotal));
-    }
-
-    public function SaldoTotalWithOutSymbol() {
-        if(!is_null($this->saldoTotalWithOutSymbol)) return $this->saldoTotalWithOutSymbol;        
-        $this->Conectar();
+    public function SaldoObligatorio() {
+        if (!is_null($this->saldoObligatorio)) return $this->saldoObligatorio;
+        if(is_null($this->touchId)) $this->Conectar();
         $url = self::$urlSaldo . $this->touchId;
         $crawler = $this->request->request('GET', $url);
-        $saldo =  $crawler->filter('.ht-ahorrado')->each(function ($node) {
-           return $node->text();
-        });
-        $this->setSaldo($saldo[0]);
-        $this->clearSaldo();
-        return $this->saldoTotalWithOutSymbol;
+        $arrayKey = $crawler->filter('.h5.font-medium')->each(function ($node, $i) {
+            $pos = strpos($node->text(), 'Obligatorias');
+            if ($pos !== false) {
+                return $i;
+            }
+         });
+         foreach ($arrayKey as $value) {
+            if(!is_null($value)){
+                $this->saldoObligatorio = $crawler->filter('div.ht-col-lg-2.ht-col-sm-3.hidden-xs.column > .h5')->eq($value)->text();
+                return $this->saldoObligatorio;
+            }
+         }
+    }
+
+    public function SaldoCuenta2() {
+        if (!is_null($this->saldoCuenta2)) return $this->saldoCuenta2;
+        if(is_null($this->touchId)) $this->Conectar();
+        $url = self::$urlSaldo . $this->touchId;
+        $crawler = $this->request->request('GET', $url);
+        $arrayKey = $crawler->filter('.h5.font-medium')->each(function ($node, $i) {
+            $pos = strpos($node->text(), 'Cuenta 2');
+            if ($pos !== false) {
+                return $i;
+            }
+         });
+         foreach ($arrayKey as $value) {
+            if(!is_null($value)){
+                $this->saldoCuenta2 = $crawler->filter('div.ht-col-lg-2.ht-col-sm-3.hidden-xs.column > .h5')->eq($value)->text();
+                return $this->saldoCuenta2;
+            }
+         }
     }
 }
