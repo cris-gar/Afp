@@ -18,8 +18,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Afp\\": "src/",
-            "Afp\\tipos\\": "src/"
+            "Afp\\": "src/"
         }
     }
 }
