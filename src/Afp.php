@@ -2,10 +2,15 @@
 
 namespace Afp;
 
+use function GuzzleHttp\Psr7\str;
+
 class Afp
 {
     private $rut;
     private $password;
+    private $saldoTotal;
+    private $saldoObligatorio;
+    private $saldoCuenta2;
 
     function __construct()
     {
@@ -42,5 +47,33 @@ class Afp
     
     public function getPassword() {
         return $this->password;
+    }
+
+    public function setSaldoTotal($saldoTotal) {
+        $this->saldoTotal = $this->CleanDinero($saldoTotal);
+    }
+
+    public function getSaldoTotal() {
+        return $this->saldoTotal;
+    }
+
+    public function setCuentaObligatoria($saldoTotal) {
+        $this->saldoObligatorio = $this->CleanDinero($saldoTotal);
+    }
+
+    public function getSaldoObligatorio() {
+        return $this->saldoObligatorio;
+    }
+
+    public function setCuenta2($saldoTotal) {
+        $this->saldoCuenta2 = $this->CleanDinero($saldoTotal);
+    }
+
+    public function getSaldoCuenta2() {
+        return $this->saldoCuenta2;
+    }
+
+    public function CleanDinero($dinero) {
+        return str_replace('$', '', str_replace(',', '', str_replace('.', '', $dinero)));
     }
 }

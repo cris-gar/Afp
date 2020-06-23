@@ -10,9 +10,6 @@ class Habitad extends Afp
     static $urlSaldo = 'https://www.afphabitat.cl/homePrivadoWeb/afiliado/homeafiliado.htm?touchId=';
     private $touchId;
     private $request;
-    private $saldoTotal;
-    private $saldoObligatorio;
-    private $saldoCuenta2;
 
     function __construct($params)
     {
@@ -49,23 +46,20 @@ class Habitad extends Afp
     }
 
     public function SaldoTotal() {
-        if(!is_null($this->saldoTotal)) return $this->saldoTotal;
+        if(!is_null(parent::getSaldoTotal())) return parent::getSaldoTotal();
         if(is_null($this->touchId)) $this->Conectar();
         $url = self::$urlSaldo . $this->touchId;
         $crawler = $this->request->request('GET', $url);
         $saldo =  $crawler->filter('.ht-ahorrado')->each(function ($node) {
            return $node->text();
         });
-        $this->setSaldo($saldo[0]);
-        return $this->saldoTotal;
+        parent::setSaldoTotal($saldo[0]);
+        return parent::getSaldoTotal();
     }
  
-    protected function setSaldo($saldo) {
-        $this->saldoTotal = $saldo;
-    }
 
     public function SaldoObligatorio() {
-        if (!is_null($this->saldoObligatorio)) return $this->saldoObligatorio;
+        if (!is_null(parent::getSaldoObligatorio())) return parent::getSaldoObligatorio();
         if(is_null($this->touchId)) $this->Conectar();
         $url = self::$urlSaldo . $this->touchId;
         $crawler = $this->request->request('GET', $url);
@@ -77,14 +71,14 @@ class Habitad extends Afp
          });
          foreach ($arrayKey as $value) {
             if(!is_null($value)){
-                $this->saldoObligatorio = $crawler->filter('div.ht-col-lg-2.ht-col-sm-3.hidden-xs.column > .h5')->eq($value)->text();
-                return $this->saldoObligatorio;
+                parent::setCuentaObligatoria($crawler->filter('div.ht-col-lg-2.ht-col-sm-3.hidden-xs.column > .h5')->eq($value)->text());
+                return parent::getSaldoObligatorio();
             }
          }
     }
 
     public function SaldoCuenta2() {
-        if (!is_null($this->saldoCuenta2)) return $this->saldoCuenta2;
+        if (!is_null(parent::getSaldoCuenta2())) return parent::getSaldoCuenta2();
         if(is_null($this->touchId)) $this->Conectar();
         $url = self::$urlSaldo . $this->touchId;
         $crawler = $this->request->request('GET', $url);
@@ -96,8 +90,8 @@ class Habitad extends Afp
          });
          foreach ($arrayKey as $value) {
             if(!is_null($value)){
-                $this->saldoCuenta2 = $crawler->filter('div.ht-col-lg-2.ht-col-sm-3.hidden-xs.column > .h5')->eq($value)->text();
-                return $this->saldoCuenta2;
+                parent::setCuenta2($crawler->filter('div.ht-col-lg-2.ht-col-sm-3.hidden-xs.column > .h5')->eq($value)->text());
+                return parent::getSaldoCuenta2();
             }
          }
     }
